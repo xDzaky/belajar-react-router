@@ -1,0 +1,49 @@
+Day 14-15: React Router Implementation - Basic & Advanced Routing
+
+Features Implemented:
+
+Day 14 (Basic Routing):
+- Setup React Router v6 with BrowserRouter
+- Created 7 pages: Home, About, Projects, ProjectDetail, Contact, Login, NotFound
+- Implemented navigation with Link and NavLink (active styling)
+- Dynamic routes with useParams (/projects/:id)
+- Protected routes with PrivateRoute component
+- Programmatic navigation with useNavigate
+- 404 handling with catch-all route
+
+Day 15 (Advanced Routing):
+- Nested routes with parent-child relationships
+- MainLayout component (Navbar + Outlet + Footer) for public pages
+- DashboardLayout component (Sidebar + Outlet) for dashboard
+- Created 3 dashboard sub-pages:
+  * DashboardHome - Overview with stats and quick actions
+  * DashboardStats - Learning progress tracking
+  * DashboardSettings - Profile management
+- Search functionality with useSearchParams in Projects page
+- Index routes for default dashboard view
+- Fixed sidebar layout (full height, no gap, proper active styling)
+
+Files Added/Modified:
+- src/layouts/MainLayout.jsx (NEW)
+- src/layouts/DashboardLayout.jsx (NEW)
+- src/pages/dashboard/DashboardHome.jsx (NEW)
+- src/pages/dashboard/DashboardStats.jsx (NEW)
+- src/pages/dashboard/DashboardSettings.jsx (NEW)
+- src/App.jsx (REFACTORED with nested routes)
+- src/pages/Projects.jsx (ADDED search with useSearchParams)
+- All page components and navigation components
+
+Concepts Learned:
+- Nested Routes & Outlet component
+- Layout components pattern
+- Query parameters with useSearchParams
+- Protected nested routes
+- Active link styling with NavLink
+- Programmatic navigation
+- Index routes
+
+Status: Build successful, All routes tested, Production ready
+
+Student: Achmad Dzaky Habibullah Al Azhar
+School: SMK Negeri 1 Probolinggo
+Program: Frontend Internship - Hummatech
