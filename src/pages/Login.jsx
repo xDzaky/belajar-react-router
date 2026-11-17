@@ -1,13 +1,18 @@
 import { useState } from 'react';
-import { Container, Form, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { Container, Form, Button, Alert } from 'react-bootstrap';
+import { useNavigate, useLocation } from 'react-router-dom';  // ← Tambah useLocation
+import { useAuth } from '../context/AuthContext';  // ← IMPORT useAuth
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();  // ← Untuk akses state dari redirect
+  const { login } = useAuth();  // ← Ambil login function dari context
+  
   const [credentials, setCredentials] = useState({
     username: '',
     password: ''
   });
+  const [error, setError] = useState('');  // ← State untuk error message
 
   const handleChange = (e) => {
     setCredentials({
@@ -18,22 +23,42 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');  // ← Clear error sebelum submit
     
-    // Dummy authentication
-    if (credentials.username === 'dzaky' && credentials.password === 'password123') {
-      // Set login flag
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', credentials.username);
+    // Validasi input kosong
+    if (!credentials.username.trim() || !credentials.password.trim()) {
+      setError('Username dan password harus diisi!');
+      return;
+    }
+    
+    // Panggil login() dari AuthContext
+    const success = login(credentials.username, credentials.password);
+    
+    if (success) {
+      // Login berhasil!
       
-      navigate('/dashboard');
+      // Ambil intended route dari location.state (dari PrivateRoute redirect)
+      const from = location.state?.from?.pathname || '/dashboard';
+      
+      // Redirect ke halaman yang dimaksud
+      // replace: true → ganti history entry (user gak bisa back ke login)
+      navigate(from, { replace: true });
     } else {
-      alert('Username atau password salah!');
+      // Login gagal (shouldn't happen dengan current logic, tapi untuk safety)
+      setError('Login gagal. Coba lagi.');
     }
   };
 
   return (
     <Container style={{ paddingTop: '100px', paddingBottom: '60px', maxWidth: '400px' }}>
-      <h1 style={{ marginBottom: '32px', textAlign: 'center' }}>Login 🔐</h1>
+      <h1 style={{ marginBottom: '32px', textAlign: 'center' }}>Login</h1>
+      
+      {/* ← Show error message jika ada */}
+      {error && (
+        <Alert variant="danger" dismissible onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
       
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
@@ -65,9 +90,10 @@ function Login() {
         </Button>
 
         <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '14px', color: '#6c757d' }}>
-          <p>Demo credentials:</p>
-          <p>Username: <strong>dzaky</strong></p>
-          <p>Password: <strong>password123</strong></p>
+          <p>Demo - Masukkan username & password apapun untuk login</p>
+          <p style={{ fontSize: '12px', marginTop: '8px' }}>
+            Contoh: username: <strong>dzaki</strong>, password: <strong>12345</strong>
+          </p>
         </div>
       </Form>
     </Container>

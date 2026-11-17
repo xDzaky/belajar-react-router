@@ -1,12 +1,13 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';  // ← IMPORT useAuth
 
 function DashboardLayout() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();  // ← Ambil user & logout dari context
   
   const handleLogout = () => {
-    // Hapus auth dari localStorage
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('username');
+    // Panggil logout() dari AuthContext
+    logout();
     
     // Redirect ke login
     navigate('/login');
@@ -41,6 +42,38 @@ function DashboardLayout() {
         display: 'flex',
         flexDirection: 'column'
       }}>
+        {/* ← USER INFO SECTION - NEW! */}
+        <div style={{
+          marginBottom: '24px',
+          padding: '16px',
+          backgroundColor: '#e7f3ff',
+          borderRadius: '8px',
+          border: '1px solid #0d6efd'
+        }}>
+          <div style={{ 
+            fontSize: '14px', 
+            color: '#666', 
+            marginBottom: '4px' 
+          }}>
+            Logged in as
+          </div>
+          <div style={{ 
+            fontSize: '16px', 
+            fontWeight: '600', 
+            color: '#0d6efd',
+            wordBreak: 'break-word'
+          }}>
+            👤 {user?.username || 'User'}
+          </div>
+          <div style={{ 
+            fontSize: '12px', 
+            color: '#888',
+            marginTop: '4px'
+          }}>
+            {user?.email || 'user@example.com'}
+          </div>
+        </div>
+        
         <h4 style={{ 
           marginBottom: '20px', 
           paddingBottom: '10px', 
@@ -81,10 +114,14 @@ function DashboardLayout() {
           className="btn btn-danger w-100"
           style={{ 
             padding: '10px',
-            fontWeight: '500'
+            fontWeight: '500',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
           }}
         >
-            Logout
+          Logout
         </button>
       </aside>
       

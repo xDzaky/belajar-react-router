@@ -10,7 +10,7 @@ function Home() {
           Welcome to My Portfolio 👋
         </h1>
         <p style={{ fontSize: '20px', color: '#6c757d', marginBottom: '32px' }}>
-          Saya Dzaki, lagi magang frontend di Hummatech
+          Saya Dzaki, lagi magang divisi frontend di Hummatech
         </p>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
           <Link to="/projects">
