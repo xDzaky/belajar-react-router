@@ -2,6 +2,15 @@ import { useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';  // ← Tambah useLocation
 import { useAuth } from '../context/AuthContext';  // ← IMPORT useAuth
+// import { zodResolver } from '@hookform/resolvers/zod'
+// import * as z from "zod";
+
+  // const loginSchema = z.object({
+  //   email: z.string().min(1, 'Email wajib diisi').email('Format email tidak valid!'),
+  //   password: z.string().min(6, 'Password minimal 6 karakter')
+  // })
+
+  // type LoginFormType = z.infer<typeof loginSchema>;
 
 function Login() {
   const navigate = useNavigate();

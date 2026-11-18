@@ -1,142 +1,284 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 
-function Contact() {
-  const navigate = useNavigate();
+/**
+ * ContactFormManual - Implementasi Form Handling Manual dengan useState
+ * 
+ * Tujuan:
+ * - Memahami Controlled Components
+ * - Memahami pengelolaan form dengan useState
+ * - Memahami validasi manual
+ * - Memahami handling submit
+ * 
+ * Ini adalah pendekatan MANUAL tanpa library.
+ * Nanti bandingkan dengan implementasi React Hook Form!
+ */
+function ContactFormManual() {
+  // State untuk menyimpan nilai semua input form
   const [formData, setFormData] = useState({
-    name: '',
+    fullName: '',
     email: '',
+    subject: '',
     message: ''
   });
-  
-  // Track unsaved changes
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  
-  // Detect when form has data (unsaved changes)
-  useEffect(() => {
-    const hasData = formData.name || formData.email || formData.message;
-    setHasUnsavedChanges(hasData);
-  }, [formData]);
-  
-  // Navigation Guard - Prevent leaving with unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = ''; // Chrome requires this for the dialog
-      }
-    };
-    
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [hasUnsavedChanges]);
 
+  // State untuk error messages per field
+  const [errors, setErrors] = useState({
+    fullName: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+
+  // State untuk pesan sukses/gagal global
+  const [submitStatus, setSubmitStatus] = useState({
+    type: '', // 'success' | 'error'
+    message: ''
+  });
+
+  // State untuk loading (opsional, untuk UX)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  /**
+   * Handler untuk perubahan input
+   * Menggunakan spread operator untuk mempertahankan nilai field lain
+   */
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    
+    // Update nilai input
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Clear error untuk field yang sedang diedit
+    setErrors(prev => ({
+      ...prev,
+      [name]: ''
+    }));
+
+    // Clear status submit jika user mulai mengedit lagi
+    if (submitStatus.message) {
+      setSubmitStatus({ type: '', message: '' });
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Simulasi kirim form
-    alert(`Terima kasih ${formData.name}! Pesan kamu sudah dikirim.`);
-    
-    // Reset form & clear unsaved changes flag
-    setFormData({ name: '', email: '', message: '' });
-    setHasUnsavedChanges(false);
-    
-    // Redirect ke home setelah 1 detik
-    setTimeout(() => {
-      navigate('/');
-    }, 1000);
-  };
-  
-  // Handle cancel dengan confirm
-  const handleCancel = () => {
-    if (hasUnsavedChanges) {
-      const confirm = window.confirm(
-        'Ada perubahan yang belum disimpan. Yakin ingin keluar?'
-      );
-      if (confirm) {
-        navigate('/');
-      }
+  /**
+   * Validasi manual untuk setiap field
+   * Returns true jika valid, false jika ada error
+   */
+  const validateForm = () => {
+    const newErrors = {
+      fullName: '',
+      email: '',
+      subject: '',
+      message: ''
+    };
+    let isValid = true;
+
+    // Validasi Full Name
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = 'Full Name wajib diisi';
+      isValid = false;
+    } else if (formData.fullName.trim().length < 3) {
+      newErrors.fullName = 'Full Name minimal 3 karakter';
+      isValid = false;
+    }
+
+    // Validasi Email
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email wajib diisi';
+      isValid = false;
     } else {
-      navigate('/');
+      // Simple email regex validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = 'Format email tidak valid';
+        isValid = false;
+      }
+    }
+
+    // Validasi Subject
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Subject wajib diisi';
+      isValid = false;
+    } else if (formData.subject.trim().length < 5) {
+      newErrors.subject = 'Subject minimal 5 karakter';
+      isValid = false;
+    }
+
+    // Validasi Message
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message wajib diisi';
+      isValid = false;
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message minimal 10 karakter';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  /**
+   * Handler untuk submit form
+   * Menggunakan e.preventDefault() untuk mencegah reload halaman
+   */
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // ← Penting! Mencegah reload halaman
+    
+    // Reset status
+    setSubmitStatus({ type: '', message: '' });
+
+    // Validasi form
+    if (!validateForm()) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Mohon periksa kembali input Anda.'
+      });
+      return;
+    }
+
+    // Set loading state
+    setIsSubmitting(true);
+
+    try {
+      // Simulasi API call (di real app, ini akan menjadi fetch/axios)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Tampilkan data yang disubmit ke console
+      console.log('Full Name:', formData.fullName);
+      console.log('Email:', formData.email);
+      console.log('Subject:', formData.subject);
+      console.log('Message:', formData.message);
+      console.log('Submitted at:', new Date().toISOString());
+
+      // Tampilkan pesan sukses
+      setSubmitStatus({
+        type: 'success',
+        message: 'Pesan berhasil dikirim uy!'
+      });
+
+      // Reset form setelah submit berhasil
+      setFormData({
+        fullName: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+
+    } catch (error) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Terjadi kesalahan saat mengirim pesan.'
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Container style={{ paddingTop: '100px', paddingBottom: '60px', maxWidth: '600px' }}>
-      <h1 style={{ marginBottom: '32px' }}>Contact Me 📧</h1>
+      <h1 style={{ marginBottom: '32px', textAlign: 'center' }}>
+        Contact Form
+      </h1>
       
-      {/* Warning untuk unsaved changes */}
-      {hasUnsavedChanges && (
-        <Alert variant="warning">
-          ⚠️ Ada perubahan yang belum disimpan
+      {/* Global Status Message */}
+      {submitStatus.message && (
+        <Alert 
+          variant={submitStatus.type === 'success' ? 'success' : 'danger'} 
+          dismissible 
+          onClose={() => setSubmitStatus({ type: '', message: '' })}
+          style={{ marginBottom: '24px' }}
+        >
+          {submitStatus.message}
         </Alert>
       )}
-      
+
       <Form onSubmit={handleSubmit}>
+        {/* Full Name Field */}
         <Form.Group className="mb-3">
-          <Form.Label>Name</Form.Label>
+          <Form.Label>Full Name *</Form.Label>
           <Form.Control 
             type="text" 
-            name="name"
-            value={formData.name}
+            name="fullName"
+            value={formData.fullName}
             onChange={handleChange}
-            placeholder="Masukkan nama kamu"
-            required
+            placeholder="Masukkan nama lengkap"
+            isInvalid={!!errors.fullName}
+            disabled={isSubmitting}
           />
+          <Form.Control.Feedback type="invalid">
+            {errors.fullName}
+          </Form.Control.Feedback>
         </Form.Group>
 
+        {/* Email Field */}
         <Form.Group className="mb-3">
-          <Form.Label>Email</Form.Label>
+          <Form.Label>Email *</Form.Label>
           <Form.Control 
             type="email" 
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="email@example.com"
-            required
+            placeholder="nama@email.com"
+            isInvalid={!!errors.email}
+            disabled={isSubmitting}
           />
+          <Form.Control.Feedback type="invalid">
+            {errors.email}
+          </Form.Control.Feedback>
         </Form.Group>
 
+        {/* Subject Field */}
         <Form.Group className="mb-3">
-          <Form.Label>Message</Form.Label>
+          <Form.Label>Subject *</Form.Label>
           <Form.Control 
-            as="textarea" 
-            rows={5}
+            type="text" 
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            placeholder="Masukkan subject pesan"
+            isInvalid={!!errors.subject}
+            disabled={isSubmitting}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.subject}
+          </Form.Control.Feedback>
+        </Form.Group>
+
+        {/* Message Field */}
+        <Form.Group className="mb-3">
+          <Form.Label>Message *</Form.Label>
+          <Form.Control 
+            as="textarea"
             name="message"
             value={formData.message}
             onChange={handleChange}
-            placeholder="Tulis pesan kamu di sini..."
-            required
+            placeholder="Tulis pesan Anda di sini..."
+            rows={5}
+            isInvalid={!!errors.message}
+            disabled={isSubmitting}
           />
+          <Form.Control.Feedback type="invalid">
+            {errors.message}
+          </Form.Control.Feedback>
         </Form.Group>
 
-        <Button variant="primary" type="submit">
-          Send Message
-        </Button>
-        
-        {/* Cancel button */}
+        {/* Submit Button */}
         <Button 
-          variant="secondary" 
-          onClick={handleCancel}
-          style={{ marginLeft: '10px' }}
+          variant="primary" 
+          type="submit" 
+          style={{ width: '100%' }}
+          disabled={isSubmitting}
         >
-          Cancel
+          {isSubmitting ? 'Mengirim...' : 'Kirim Pesan'}
         </Button>
       </Form>
+
     </Container>
   );
 }
 
-export default Contact;
+export default ContactFormManual;
