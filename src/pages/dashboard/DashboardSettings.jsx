@@ -7,7 +7,7 @@ function DashboardSettings() {
   const username = localStorage.getItem('username') || 'User';
   
   const [profile, setProfile] = useState({
-    name: 'Achmad Dzaky Habibullah Al Azhar',
+    name: 'Achmad Dzaki Habibullah Al Azhar',
     email: 'dzaky@example.com',
     school: 'SMK Negeri 1 Probolinggo',
     notifications: true

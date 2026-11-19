@@ -26,6 +26,7 @@ const About = lazy(() => import('./pages/About'));
 const Projects = lazy(() => import('./pages/Projects'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const Contact = lazy(() => import('./pages/Contact'));
+const UserDataForm = lazy(() => import('./pages/UserDataForm'));
 
 // Dashboard - Lazy (karena butuh auth, gak semua user akses)
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'));
@@ -46,6 +47,7 @@ function App() {
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/user-data-form" element={<UserDataForm />} />
         </Route>
         
         {/* Login Route (no layout) */}

@@ -11,6 +11,7 @@ function MainLayout() {
       { label: "About", href: "/about" },
       { label: "Projects", href: "/projects" },
       { label: "Contact", href: "/contact" },
+      { label: "User Data Form", href: "/user-data-form" },
       { label: "Dashboard", href: "/dashboard" },
     ]
   };
@@ -18,7 +19,7 @@ function MainLayout() {
   // Data untuk Footer
   const footerData = {
     companyName: "Hummatech",
-    copyright: "© 2026 By Achmad Dzaky Habibullah Al Azhar - Program Magang Frontend Hummatech",
+    copyright: "© 2026 By Achmad Dzaki Habibullah Al Azhar - Program Magang Frontend Hummatech",
     description: "Building amazing web applications with React JS. Learning React Router for multi-page navigation.",
     socialLinks: [
       {
@@ -31,6 +32,7 @@ function MainLayout() {
       { label: "About", href: "/about" },
       { label: "Projects", href: "/projects" },
       { label: "Contact", href: "/contact" },
+      { label: "User Data Form", href: "/user-data-form" },
     ],
     helpMenu: [
       { label: "Documentation", href: "#" },

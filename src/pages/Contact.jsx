@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 
 /**
- * ContactFormManual - Implementasi Form Handling Manual dengan useState
+ * Contact - Implementasi Form Handling Manual dengan useState
  * 
  * Tujuan:
  * - Memahami Controlled Components
@@ -13,7 +13,7 @@ import { Container, Form, Button, Alert } from 'react-bootstrap';
  * Ini adalah pendekatan MANUAL tanpa library.
  * Nanti bandingkan dengan implementasi React Hook Form!
  */
-function ContactFormManual() {
+function ContactForm() {
   // State untuk menyimpan nilai semua input form
   const [formData, setFormData] = useState({
     fullName: '',
@@ -281,4 +281,4 @@ function ContactFormManual() {
   );
 }
 
-export default ContactFormManual;
+export default ContactForm;

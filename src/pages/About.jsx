@@ -9,7 +9,7 @@ function About() {
         <div style={{ marginBottom: '32px' }}>
           <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>Bio</h2>
           <p style={{ lineHeight: '1.8', color: '#495057' }}>
-            Halo! Saya Achmad Dzaky Habibullah Al Azhar, siswa SMK Negeri 1 Probolinggo 
+            Halo! Saya Achmad Dzaki Habibullah Al Azhar, siswa SMK Negeri 1 Probolinggo 
             yang sedang menjalani program magang frontend di Hummatech. Saya passionate 
             dalam web development dan sedang belajar React JS.
           </p>
