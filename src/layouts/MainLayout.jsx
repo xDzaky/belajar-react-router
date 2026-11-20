@@ -13,6 +13,7 @@ function MainLayout() {
       { label: "Contact", href: "/contact" },
       { label: "User Data Form", href: "/user-data-form" },
       { label: "Dashboard", href: "/dashboard" },
+      { label: "CRUD", href: "/crud" },
     ]
   };
 

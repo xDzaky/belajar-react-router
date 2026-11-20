@@ -35,6 +35,7 @@ const DashboardStats = lazy(() => import('./pages/dashboard/DashboardStats'));
 const DashboardSettings = lazy(() => import('./pages/dashboard/DashboardSettings'));
 
 import './App.css';
+import CRUD from './pages/CRUDWithAPI';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/user-data-form" element={<UserDataForm />} />
+          <Route path="/crud" element={<CRUD />} />
         </Route>
         
         {/* Login Route (no layout) */}
