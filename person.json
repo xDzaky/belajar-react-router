@@ -1,0 +1,15 @@
+{
+  "person": [
+    {
+      "id": "1",
+      "name": "Azhar",
+      "email": "azhartes@gmail.com"
+    },
+    {
+      "name": "Dzaki",
+      "email": "Dzaki@gmail.com",
+      "id": "-iMRjMkK0Vw"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
