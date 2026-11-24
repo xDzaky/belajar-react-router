@@ -30,6 +30,7 @@ function CRUD() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState(null);
 
   const {
     register,
@@ -45,7 +46,7 @@ function CRUD() {
     },
   });
 
-  // Fetch Data Pengguna (READ / GET)
+  // 1. READ / GET: Mengambil Data Pengguna dari API
   const fetchUsers = () => {
     personService
       .getAll()
@@ -72,23 +73,33 @@ function CRUD() {
     fetchUsers();
   }, []);
 
-  // Handle Submit Form: CREATE (POST) atau UPDATE (PUT)
+  // 2. CREATE (POST) & 3. UPDATE (PUT): Menambah data baru atau mengganti seluruh data
   const onSubmit = async (data) => {
     setErrorMessage(null);
     setSuccessMessage(null);
 
     try {
       if (editingId) {
-        // Mode UPDATE (PUT)
-        const response = await personService.update(editingId, data);
+        // Mode UPDATE (PUT): Mengirim pembaruan data secara menyeluruh
+        const currentUser = users.find((u) => u.id === editingId);
+        const updatedPayload = {
+          ...data,
+          status: currentUser?.status || 'active',
+        };
+
+        const response = await personService.update(editingId, updatedPayload);
         setUsers(users.map((u) => (u.id === editingId ? response.data : u)));
-        setSuccessMessage('Data pengguna berhasil diperbarui!');
+        setSuccessMessage('Data pengguna berhasil diperbarui secara penuh (PUT)!');
         setEditingId(null);
       } else {
-        // Mode CREATE (POST)
-        const response = await personService.create(data);
+        // Mode CREATE (POST): Menambahkan data baru
+        const newPayload = {
+          ...data,
+          status: 'active',
+        };
+        const response = await personService.create(newPayload);
         setUsers([...users, response.data]);
-        setSuccessMessage('Pengguna baru berhasil ditambahkan!');
+        setSuccessMessage('Pengguna baru berhasil ditambahkan (POST)!');
       }
       reset();
     } catch {
@@ -96,7 +107,28 @@ function CRUD() {
     }
   };
 
-  // Handle Edit
+  // 4. PARTIAL UPDATE (PATCH): Mengubah hanya satu atribut (status) tanpa replace seluruh object
+  const handleToggleStatus = async (user) => {
+    const nextStatus = user.status === 'inactive' ? 'active' : 'inactive';
+    setUpdatingStatusId(user.id);
+    setErrorMessage(null);
+
+    try {
+      const response = await personService.patchStatus(user.id, nextStatus);
+      setUsers(
+        users.map((u) => (u.id === user.id ? { ...u, status: response.data.status } : u))
+      );
+      setSuccessMessage(
+        `Status ${user.name} berhasil diubah menjadi "${nextStatus}" via partial update (PATCH)!`
+      );
+    } catch {
+      setErrorMessage('Gagal memperbarui status pengguna melalui PATCH.');
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
+
+  // Handle Edit (Isi form dengan data yang dipilih)
   const handleEdit = (user) => {
     setEditingId(user.id);
     setValue('name', user.name);
@@ -111,7 +143,7 @@ function CRUD() {
     reset();
   };
 
-  // Handle Delete (DELETE)
+  // 5. DELETE: Menghapus data pengguna dari server
   const handleDelete = async (id) => {
     if (!window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) return;
 
@@ -119,7 +151,7 @@ function CRUD() {
     try {
       await personService.delete(id);
       setUsers(users.filter((u) => u.id !== id));
-      setSuccessMessage('Pengguna berhasil dihapus.');
+      setSuccessMessage('Pengguna berhasil dihapus dari server (DELETE).');
       if (editingId === id) handleCancelEdit();
     } catch {
       setErrorMessage('Gagal menghapus pengguna dari server.');
@@ -127,8 +159,8 @@ function CRUD() {
   };
 
   return (
-    <Container className="mt-4 mb-5" style={{ maxWidth: '650px' }}>
-      {/* Alert Notifikasi */}
+    <Container className="mt-4 mb-5" style={{ maxWidth: '720px' }}>
+      {/* Alert Notifikasi Feedback */}
       {successMessage && (
         <Alert variant="success" dismissible onClose={() => setSuccessMessage(null)}>
           {successMessage}
@@ -154,9 +186,9 @@ function CRUD() {
         >
           <div className="d-flex justify-content-between align-items-center">
             <h4 className="mb-0">
-              {editingId ? '✏️ Edit Pengguna' : 'Tambah Pengguna'}
+              {editingId ? '✏️ Edit Pengguna (PUT)' : '➕ Tambah Pengguna (POST)'}
             </h4>
-            {editingId && <Badge bg="dark">ID: {editingId}</Badge>}
+            {editingId && <Badge bg="dark">Editing ID: {editingId}</Badge>}
           </div>
         </Card.Header>
         <Card.Body className="p-4">
@@ -189,7 +221,7 @@ function CRUD() {
               </Form.Control.Feedback>
             </Form.Group>
 
-            {/* Tombol Aksi */}
+            {/* Tombol Aksi Form */}
             <div className="d-flex gap-2">
               <Button
                 variant={editingId ? 'warning' : 'primary'}
@@ -200,12 +232,12 @@ function CRUD() {
                 {isSubmitting ? (
                   <>
                     <Spinner size="sm" animation="border" className="me-2" />
-                    Menyimpan...
+                    Menyimpan ke Server...
                   </>
                 ) : editingId ? (
-                  'Perbarui Pengguna'
+                  'Perbarui Pengguna (PUT)'
                 ) : (
-                  'Simpan Pengguna'
+                  'Simpan Pengguna (POST)'
                 )}
               </Button>
 
@@ -226,24 +258,26 @@ function CRUD() {
       {/* List Data Pengguna */}
       <Card className="mt-4 shadow-sm border-0">
         <Card.Header className="bg-light d-flex justify-content-between align-items-center">
-          <h5 className="mb-0">Daftar Pengguna</h5>
-          <Badge bg="secondary">{users.length} Data</Badge>
+          <h5 className="mb-0">📋 Daftar Pengguna Terdaftar (GET)</h5>
+          <div className="d-flex gap-2 align-items-center">
+            <Badge bg="primary">{users.length} Data</Badge>
+          </div>
         </Card.Header>
         <Card.Body>
           {/* Loading State */}
           {isLoading ? (
             <div className="text-center py-4">
               <Spinner animation="border" variant="primary" />
-              <p className="text-muted mt-2 mb-0">Memuat data dari API...</p>
+              <p className="text-muted mt-2 mb-0">Memuat data dari API (GET)...</p>
             </div>
           ) : users.length === 0 ? (
             /* Empty State */
             <div className="text-center py-4 text-muted">
               <p className="mb-0">Belum ada data pengguna.</p>
-              <small>Gunakan form di atas untuk menambahkan data baru.</small>
+              <small>Gunakan formulir di atas untuk menambahkan data baru ke server.</small>
             </div>
           ) : (
-            /* Data List */
+            /* Data List Rendering */
             <ListGroup variant="flush">
               {users.map((user) => (
                 <ListGroup.Item
@@ -251,21 +285,51 @@ function CRUD() {
                   className="d-flex justify-content-between align-items-center px-2 py-3"
                 >
                   <div>
-                    <strong className="d-block">{user.name}</strong>
+                    <div className="d-flex align-items-center gap-2 mb-1">
+                      <strong className="fs-6">{user.name}</strong>
+                      <Badge
+                        bg={user.status === 'inactive' ? 'secondary' : 'success'}
+                        className="text-capitalize"
+                      >
+                        {user.status || 'active'}
+                      </Badge>
+                    </div>
                     <small className="text-muted">{user.email}</small>
                   </div>
-                  <div className="d-flex gap-2">
+                  <div className="d-flex gap-2 align-items-center">
+                    {/* Tombol PATCH: Toggle Status */}
+                    <Button
+                      variant={user.status === 'inactive' ? 'outline-success' : 'outline-secondary'}
+                      size="sm"
+                      disabled={updatingStatusId === user.id}
+                      onClick={() => handleToggleStatus(user)}
+                      title="Ubah status parsial menggunakan HTTP PATCH"
+                    >
+                      {updatingStatusId === user.id ? (
+                        <Spinner size="sm" animation="border" />
+                      ) : user.status === 'inactive' ? (
+                        'Aktifkan (PATCH)'
+                      ) : (
+                        'Nonaktifkan (PATCH)'
+                      )}
+                    </Button>
+
+                    {/* Tombol PUT: Full Update Edit */}
                     <Button
                       variant="outline-primary"
                       size="sm"
                       onClick={() => handleEdit(user)}
+                      title="Edit data penuh menggunakan HTTP PUT"
                     >
-                      Edit
+                      Edit (PUT)
                     </Button>
+
+                    {/* Tombol DELETE */}
                     <Button
                       variant="outline-danger"
                       size="sm"
                       onClick={() => handleDelete(user.id)}
+                      title="Hapus data menggunakan HTTP DELETE"
                     >
                       Delete
                     </Button>

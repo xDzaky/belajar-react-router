@@ -3,13 +3,8 @@
     {
       "id": "1",
       "name": "Azhar",
-      "email": "azhartes@gmail.com"
-    },
-    {
-      "name": "Dzaki",
-      "email": "Dzaki@gmail.com",
-      "id": "-iMRjMkK0Vw"
+      "email": "azhartes@gmail.com",
+      "status": "active"
     }
-  ],
-  "$schema": "./node_modules/json-server/schema.json"
+  ]
 }
