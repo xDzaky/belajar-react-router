@@ -1,10 +1,41 @@
 {
   "person": [
     {
-      "id": "1",
-      "name": "Azhar",
+      "name": "AzharDzaki",
       "email": "azhartes@gmail.com",
-      "status": "active"
+      "status": "active",
+      "id": "1"
+    },
+    {
+      "name": "RasyaGamingOverpower",
+      "email": "RasyaGaming@gmail.com",
+      "status": "active",
+      "id": "DWtFXEldS7M"
+    },
+    {
+      "name": "Arif",
+      "email": "Arif123@gmail.com",
+      "status": "active",
+      "id": "8S4Td65sMFU"
+    },
+    {
+      "name": "tes1",
+      "email": "tes1@gmail.com",
+      "status": "active",
+      "id": "5TXblxXWumA"
+    },
+    {
+      "name": "tes2",
+      "email": "tes2@gmail.com",
+      "status": "active",
+      "id": "hlO7FccRfBg"
+    },
+    {
+      "name": "tes3",
+      "email": "tes3@gmail.com",
+      "status": "active",
+      "id": "yRLrFPXRU68"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
