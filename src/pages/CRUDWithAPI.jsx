@@ -14,33 +14,63 @@ function CRUD() {
   const [successMessage, setSuccessMessage] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [loadingStatusId, setLoadingStatusId] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('')
 
-  // Search Logic
-  const filteredUsers = users.filter((user) => {
-    const query = searchQuery.toLowerCase().trim();
-    const matchName = user.name.toLowerCase().includes(query);
-    const matchEmail = user.email.toLowerCase().includes(query);
-    return matchName || matchEmail
-  })
-
-  // ==========================================
-  // 2. LOGIKA PAGINATION (5 Data per Halaman)
-  // ==========================================
+  // Filter, Search, Sort & Pagination States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('default');
   const [page, setPage] = useState(1);
   const limit = 5;
 
-  const startIndex = (page - 1) * limit;
-  const displayedUsers = filteredUsers.slice(startIndex, startIndex + limit);
-  const totalPages = Math.ceil(filteredUsers.length / limit);
+  // ==========================================
+  // 2. PIPELINE: FILTER -> SORT -> PAGINATION
+  // ==========================================
 
-  // Cari object pengguna yang sedang diedit (jika ada)
+  // 1. Filter Pencarian (nama & email) & Filter Status (all, active, inactive)
+  const filteredUsers = users.filter((user) => {
+    const query = searchQuery.toLowerCase().trim();
+    const matchSearch =
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query);
+
+    const matchStatus =
+      statusFilter === 'all' || user.status === statusFilter;
+
+    return matchStatus && matchSearch;
+  });
+
+  // 2. Sorting Data (Default, A-Z, Z-A)
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    if (sortBy === 'name-asc') {
+      return a.name.localeCompare(b.name);
+    }
+    if (sortBy === 'name-desc') {
+      return b.name.localeCompare(a.name);
+    }
+    return 0;
+  });
+
+  // 3. Logika Pagination dari Data yang Sudah Disortir & Difilter
+  const totalPages = Math.ceil(sortedUsers.length / limit);
+  const startIndex = (page - 1) * limit;
+  const displayedUsers = sortedUsers.slice(startIndex, startIndex + limit);
+
+  // Object pengguna yang sedang diedit (jika ada)
   const editingUser = users.find((u) => u.id === editingId) || null;
 
+  // Handler saat input pencarian berubah
   const handleSearchChange = (query) => {
     setSearchQuery(query);
-    setPage(1)
-  }
+    setPage(1); // Reset ke halaman 1 saat keyword berubah
+  };
+
+  // Handler reset semua filter & pencarian
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setStatusFilter('all');
+    setSortBy('default');
+    setPage(1);
+  };
 
   // ==========================================
   // 3. OPERASI API (CRUD)
@@ -171,13 +201,24 @@ function CRUD() {
         onCancelEdit={() => setEditingId(null)}
       />
 
-      {/* Komponen 2: Daftar Pengguna & Pagination */}
+      {/* Komponen 2: Daftar Pengguna, Filter, Search, Sort & Pagination */}
       <UserList
         displayedUsers={displayedUsers}
         totalUsers={users.length}
         filteredCount={filteredUsers.length}
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
+        statusFilter={statusFilter}
+        onStatusFilterChange={(val) => {
+          setStatusFilter(val);
+          setPage(1);
+        }}
+        sortBy={sortBy}
+        onSortChange={(val) => {
+          setSortBy(val);
+          setPage(1);
+        }}
+        onResetFilters={handleResetFilters}
         isLoading={isLoading}
         loadingStatusId={loadingStatusId}
         onToggleStatus={handleToggleStatus}
